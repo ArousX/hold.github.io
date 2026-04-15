@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohub | 你的匿名心事港湾</title>
+    <style>
+        /* ================= 极简毛玻璃风格 ================= */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: var(--primary-bg);
+            background-attachment: fixed;
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 3rem 1.5rem;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 4rem; }
+        header h1 { font-size: 2.8rem; font-weight: 300; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        header p { color: var(--text-muted); font-weight: 300; }
+
+        /* 发布区域 */
+        .publish-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group { margin-bottom: 1.5rem; }
+
+        input, textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus { border-color: var(--accent); }
+        textarea { min-height: 100px; resize: none; }
+
+        .submit-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+        }
+
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4); }
+        .submit-btn:disabled { background: #475569; cursor: not-allowed; }
+
+        /* 留言展示区 */
+        .message-board { display: grid; gap: 1.5rem; }
+
+        .message-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .message-content { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.2rem; font-weight: 300; }
+
+        .message-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 1rem;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loading { text-align: center; color: var(--text-muted); padding: 3rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Mohub.online</h1>
+        <p>把你的故事，寄存在这里</p>
+    </header>
+
+    <section class="publish-box">
+        <div class="input-group">
+            <input type="text" id="authorInput" placeholder="你的代号 (选填)" maxlength="20">
+        </div>
+        <div class="input-group">
+            <textarea id="contentInput" placeholder="此刻在想什么？"></textarea>
+        </div>
+        <button class="submit-btn" id="submitBtn">发送至树洞</button>
+    </section>
+
+    <section class="message-board" id="messageBoard">
+        <div class="loading" id="loadingTip">正在读取寄存的消息...</div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ================= 配置 Supabase =================
+    const SUPABASE_URL = 'https://ovfwarzvmdynmysdagmy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const TABLE_NAME = 'hold'; // 表名已改为 hold
+
+    const board = document.getElementById('messageBoard');
+    const submitBtn = document.getElementById('submitBtn');
+    const authorInput = document.getElementById('authorInput');
+    const contentInput = document.getElementById('contentInput');
+
+    // 1. 获取留言
+    async function fetchMessages() {
+        try {
+            const { data: messages, error } = await supabase
+                .from(TABLE_NAME)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            renderMessages(messages);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loadingTip').textContent = '连接数据库失败，请检查配置。';
+        }
+    }
+
+    // 2. 发送留言
+    async function postMessage() {
+        const content = contentInput.value.trim();
+        const author = authorInput.value.trim() || '匿名者';
+
+        if (!content) return alert('请输入内容');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = '寄送中...';
+
+        try {
+            const { data, error } = await supabase
+                .from(TABLE_NAME)
+                .insert([{ author, content }])
+                .select();
+
+            if (error) throw error;
+
+            contentInput.value = '';
+            if (data && data.length > 0) insertSingleDOM(data[0]);
+        } catch (error) {
+            alert('发送失败，请检查 RLS 策略');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '发送至树洞';
+        }
+    }
+
+    // 3. 渲染逻辑
+    function renderMessages(list) {
+        board.innerHTML = '';
+        if (!list || list.length === 0) {
+            board.innerHTML = '<div class="loading">这里还没有声音</div>';
+            return;
+        }
+        list.forEach(msg => board.appendChild(createCard(msg)));
+    }
+
+    function insertSingleDOM(msg) {
+        if(board.querySelector('.loading')) board.innerHTML = '';
+        board.insertBefore(createCard(msg), board.firstChild);
+    }
+
+    function createCard(msg) {
+        const div = document.createElement('div');
+        div.className = 'message-card';
+        const time = new Date(msg.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        div.innerHTML = `
+            <p class="message-content"></p>
+            <div class="message-footer">
+                <span>${msg.author}</span>
+                <span>${time}</span>
+            </div>
+        `;
+        // 使用 textContent 填充内容，防止 XSS
+        div.querySelector('.message-content').textContent = msg.content;
+        return div;
+    }
+
+    submitBtn.addEventListener('click', postMessage);
+    window.addEventListener('DOMContentLoaded', fetchMessages);
+</script>
+</body>
+</html>
