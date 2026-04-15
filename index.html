@@ -126,110 +126,120 @@
     </section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    // 1. 初始化配置 (确保变量名唯一且只声明一次)
-    const SB_URL = 'https://ovfwarzvmdynmysdagmy.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs';
-    
-    const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-    const TABLE_NAME = 'hold';
+<script>
+const supabase = window.supabase.createClient(
+  'https://ovfwarzvmdynmysdagmy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs'
+);
 
-    const board = document.getElementById('messageBoard');
-    const submitBtn = document.getElementById('submitBtn');
-    const authorInput = document.getElementById('authorInput');
-    const contentInput = document.getElementById('contentInput');
+const TABLE_NAME = 'hold';
 
-    // 2. 获取留言函数
-    async function fetchMessages() {
-        try {
-            const { data: messages, error } = await supabase
-                .from(TABLE_NAME)
-                .select('*')
-                .order('created_at', { ascending: false });
+const board = document.getElementById('messageBoard');
+const submitBtn = document.getElementById('submitBtn');
+const authorInput = document.getElementById('authorInput');
+const contentInput = document.getElementById('contentInput');
 
-            if (error) throw error;
-            renderMessages(messages);
-        } catch (error) {
-            console.error('Fetch Error:', error);
-            document.getElementById('loadingTip').textContent = '读取失败，请检查数据库。';
-        }
-    }
+async function fetchMessages() {
+  board.innerHTML = '<div class="loading">正在读取寄存的消息...</div>';
 
-    // 3. 发送留言函数
-    async function postMessage() {
-        const content = contentInput.value.trim();
-        const author = authorInput.value.trim() || '匿名者';
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select('*')
+    .order('created_at', { ascending: false });
 
-        if (!content) return alert('请输入内容');
+  if (error) {
+    console.error(error);
+    board.innerHTML = `
+      <div class="loading">
+        读取失败：${error.message}
+      </div>
+    `;
+    return;
+  }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = '寄送中...';
+  board.innerHTML = '';
 
-        try {
-            const { data, error } = await supabase
-                .from(TABLE_NAME)
-                .insert([{ author, content }])
-                .select();
+  if (!data || data.length === 0) {
+    board.innerHTML = '<div class="loading">这里还没有声音</div>';
+    return;
+  }
 
-            if (error) {
-                // 如果后端有 user_id 报错，这里会捕捉到
-                throw error;
-            }
+  data.forEach(msg => {
+    board.appendChild(createCard(msg));
+  });
+}
 
-            contentInput.value = '';
-            if (data && data.length > 0) {
-                insertSingleDOM(data[0]);
-                alert('寄送成功！');
-            }
-        } catch (error) {
-            console.error('Post Error:', error);
-            alert('发送失败：' + (error.message || '请检查数据库 RLS 权限'));
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '发送至树洞';
-        }
-    }
+async function postMessage() {
+  const author = authorInput.value.trim() || '匿名者';
+  const content = contentInput.value.trim();
 
-    // 4. 辅助渲染函数
-    function renderMessages(list) {
-        board.innerHTML = '';
-        if (!list || list.length === 0) {
-            board.innerHTML = '<div class="loading">这里还没有声音</div>';
-            return;
-        }
-        list.forEach(msg => board.appendChild(createCard(msg)));
-    }
+  if (!content) {
+    alert('请输入内容');
+    return;
+  }
 
-    function insertSingleDOM(msg) {
-        if(board.querySelector('.loading')) board.innerHTML = '';
-        board.insertBefore(createCard(msg), board.firstChild);
-    }
+  submitBtn.disabled = true;
+  submitBtn.textContent = '寄送中...';
 
-    function createCard(msg) {
-        const div = document.createElement('div');
-        div.className = 'message-card';
-        const time = new Date(msg.created_at).toLocaleString('zh-CN', { 
-            month: 'short', 
-            day: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        div.innerHTML = `
-            <p class="message-content"></p>
-            <div class="message-footer">
-                <span>${msg.author}</span>
-                <span>${time}</span>
-            </div>
-        `;
-        div.querySelector('.message-content').textContent = msg.content;
-        return div;
-    }
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .insert([
+      {
+        author: author,
+        content: content
+      }
+    ])
+    .select();
 
-    // 事件监听
-    submitBtn.addEventListener('click', postMessage);
-    window.addEventListener('DOMContentLoaded', fetchMessages);
+  submitBtn.disabled = false;
+  submitBtn.textContent = '发送至树洞';
+
+  if (error) {
+    console.error(error);
+    alert('发送失败：' + error.message);
+    return;
+  }
+
+  contentInput.value = '';
+
+  if (board.querySelector('.loading')) {
+    board.innerHTML = '';
+  }
+
+  board.prepend(createCard(data[0]));
+}
+
+function createCard(msg) {
+  const card = document.createElement('div');
+  card.className = 'message-card';
+
+  let time = '';
+  if (msg.created_at) {
+    time = new Date(msg.created_at).toLocaleString('zh-CN', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  card.innerHTML = `
+    <p class="message-content"></p>
+    <div class="message-footer">
+      <span>${msg.author || '匿名者'}</span>
+      <span>${time}</span>
+    </div>
+  `;
+
+  card.querySelector('.message-content').textContent = msg.content || '';
+  return card;
+}
+
+submitBtn.addEventListener('click', postMessage);
+window.addEventListener('DOMContentLoaded', fetchMessages);
 </script>
+
 </body>
 </html>
