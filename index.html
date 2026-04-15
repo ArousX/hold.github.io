@@ -126,9 +126,8 @@
     </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     // 1. 初始化配置 (确保变量名唯一且只声明一次)
     const SB_URL = 'https://ovfwarzvmdynmysdagmy.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs';
@@ -144,7 +143,7 @@
     // 2. 获取留言函数
     async function fetchMessages() {
         try {
-            const { data: messages, error } = await supabase
+            const { data: hold, error } = await supabase
                 .from(TABLE_NAME)
                 .select('*')
                 .order('created_at', { ascending: false });
