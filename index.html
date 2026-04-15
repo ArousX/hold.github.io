@@ -1,244 +1,209 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mohub | 你的匿名心事港湾</title>
-    <style>
-        /* ================= 极简毛玻璃风格 ================= */
-        :root {
-            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohub | 你的匿名心事港湾</title>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+<style>
+:root {
+    --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-light: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+}
 
-        body {
-            background: var(--primary-bg);
-            background-attachment: fixed;
-            color: var(--text-light);
-            min-height: 100vh;
-            padding: 3rem 1.5rem;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
 
-        .container { max-width: 800px; margin: 0 auto; }
+body {
+    background: var(--primary-bg);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+}
 
-        header { text-align: center; margin-bottom: 4rem; }
-        header h1 { font-size: 2.8rem; font-weight: 300; letter-spacing: -1px; margin-bottom: 0.5rem; }
-        header p { color: var(--text-muted); font-weight: 300; }
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-        /* 发布区域 */
-        .publish-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 4rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
+header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
 
-        .input-group { margin-bottom: 1.5rem; }
+header h1 {
+    font-size: 2.8rem;
+    font-weight: 300;
+}
 
-        input, textarea {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1rem;
-            color: var(--text-light);
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s;
-        }
+header p {
+    color: var(--text-muted);
+}
 
-        input:focus, textarea:focus { border-color: var(--accent); }
-        textarea { min-height: 100px; resize: none; }
+.publish-box {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 4rem;
+}
 
-        .submit-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: block;
-            width: 100%;
-        }
+input, textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
 
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4); }
-        .submit-btn:disabled { background: #475569; cursor: not-allowed; }
+textarea {
+    min-height: 100px;
+}
 
-        /* 留言展示区 */
-        .message-board { display: grid; gap: 1.5rem; }
+button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-        .message-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.5rem;
-            animation: fadeIn 0.6s ease forwards;
-        }
+.message-board {
+    display: grid;
+    gap: 1rem;
+}
 
-        .message-content { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.2rem; font-weight: 300; white-space: pre-wrap; }
+.message-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1rem;
+}
 
-        .message-footer {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 1rem;
-        }
+.message-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .loading { text-align: center; color: var(--text-muted); padding: 3rem; }
-    </style>
+.loading {
+    text-align: center;
+    color: var(--text-muted);
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <header>
-        <h1>Mohub.online</h1>
-        <p>把你的故事，寄存在这里</p>
-    </header>
 
-    <section class="publish-box">
-        <div class="input-group">
-            <input type="text" id="authorInput" placeholder="你的代号 (选填)" maxlength="20">
-        </div>
-        <div class="input-group">
-            <textarea id="contentInput" placeholder="此刻在想什么？"></textarea>
-        </div>
-        <button class="submit-btn" id="submitBtn">发送至树洞</button>
-    </section>
+<header>
+    <h1>Mohub.online</h1>
+    <p>匿名树洞</p>
+</header>
 
-    <section class="message-board" id="messageBoard">
-        <div class="loading" id="loadingTip">正在读取寄存的消息...</div>
-    </section>
+<div class="publish-box">
+    <input id="authorInput" placeholder="你的代号（可选）">
+    <textarea id="contentInput" placeholder="写下你的心事"></textarea>
+    <button id="submitBtn">发送</button>
 </div>
 
+<div class="message-board" id="messageBoard">
+    <div class="loading">加载中...</div>
+</div>
+
+</div>
+
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
-  'https://ovfwarzvmdynmysdagmy.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs'
+const client = window.supabase.createClient(
+    'https://ovfwarzvmdynmysdagmy.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Zndhcnp2bWR5bm15c2RhZ215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNTQ5NzQsImV4cCI6MjA5MTczMDk3NH0.ZzAec-6TcRIOxfviuWSx8rdwR8S_8YeoeD_L7IWt0Gs'
 );
 
-const TABLE_NAME = 'hold';
+const TABLE = 'hold';
 
 const board = document.getElementById('messageBoard');
-const submitBtn = document.getElementById('submitBtn');
+const btn = document.getElementById('submitBtn');
 const authorInput = document.getElementById('authorInput');
 const contentInput = document.getElementById('contentInput');
 
-async function fetchMessages() {
-  board.innerHTML = '<div class="loading">正在读取寄存的消息...</div>';
+async function load() {
+    const { data, error } = await client
+        .from(TABLE)
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .select('*')
-    .order('created_at', { ascending: false });
+    if (error) {
+        board.innerHTML = error.message;
+        return;
+    }
 
-  if (error) {
-    console.error(error);
-    board.innerHTML = `
-      <div class="loading">
-        读取失败：${error.message}
-      </div>
-    `;
-    return;
-  }
-
-  board.innerHTML = '';
-
-  if (!data || data.length === 0) {
-    board.innerHTML = '<div class="loading">这里还没有声音</div>';
-    return;
-  }
-
-  data.forEach(msg => {
-    board.appendChild(createCard(msg));
-  });
-}
-
-async function postMessage() {
-  const author = authorInput.value.trim() || '匿名者';
-  const content = contentInput.value.trim();
-
-  if (!content) {
-    alert('请输入内容');
-    return;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = '寄送中...';
-
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .insert([
-      {
-        author: author,
-        content: content
-      }
-    ])
-    .select();
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = '发送至树洞';
-
-  if (error) {
-    console.error(error);
-    alert('发送失败：' + error.message);
-    return;
-  }
-
-  contentInput.value = '';
-
-  if (board.querySelector('.loading')) {
     board.innerHTML = '';
-  }
 
-  board.prepend(createCard(data[0]));
+    if (!data.length) {
+        board.innerHTML = '<div class="loading">暂无内容</div>';
+        return;
+    }
+
+    data.forEach(i => board.appendChild(card(i)));
 }
 
-function createCard(msg) {
-  const card = document.createElement('div');
-  card.className = 'message-card';
+async function send() {
+    const author = authorInput.value.trim() || '匿名';
+    const content = contentInput.value.trim();
 
-  let time = '';
-  if (msg.created_at) {
-    time = new Date(msg.created_at).toLocaleString('zh-CN', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+    if (!content) return alert('不能为空');
 
-  card.innerHTML = `
-    <p class="message-content"></p>
-    <div class="message-footer">
-      <span>${msg.author || '匿名者'}</span>
-      <span>${time}</span>
-    </div>
-  `;
+    btn.disabled = true;
 
-  card.querySelector('.message-content').textContent = msg.content || '';
-  return card;
+    const { data, error } = await client
+        .from(TABLE)
+        .insert([{ author, content }])
+        .select();
+
+    btn.disabled = false;
+
+    if (error) return alert(error.message);
+
+    contentInput.value = '';
+    board.prepend(card(data[0]));
 }
 
-submitBtn.addEventListener('click', postMessage);
-window.addEventListener('DOMContentLoaded', fetchMessages);
+function card(i) {
+    const div = document.createElement('div');
+    div.className = 'message-card';
+
+    div.innerHTML = `
+        <div>${i.content}</div>
+        <div class="message-footer">
+            <span>${i.author}</span>
+            <span>${new Date(i.created_at).toLocaleString()}</span>
+        </div>
+    `;
+    return div;
+}
+
+btn.onclick = send;
+load();
 </script>
 
 </body>
