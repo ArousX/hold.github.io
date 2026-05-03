@@ -93,7 +93,18 @@ button {
     border-radius: 16px;
     padding: 1rem;
 }
-
+.message-content { 
+                    font-size: 1.1rem; 
+                    line-height: 1.7; 
+                    margin-bottom: 1.2rem; 
+                    font-weight: 300; 
+                    
+                    /* ================= 新增以下换行控制代码 ================= */
+                    white-space: pre-wrap;     /* 核心：保留用户在输入框里敲的回车换行，同时允许文字自动触边换行 */
+                    overflow-wrap: break-word; /* 允许在长单词或 URL 地址内部进行换行 */
+                    word-break: break-all;     /* 强制打断连续的英文字符或数字，防止把卡片撑破 */
+                }
+    
 .message-footer {
     display: flex;
     justify-content: space-between;
