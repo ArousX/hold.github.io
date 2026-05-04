@@ -7,7 +7,6 @@
 
 <style>
 :root {
-    --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-light: #f8fafc;
@@ -19,19 +18,71 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', 'Segoe UI', 'PingFang SC', sans-serif;
 }
 
+/* ================= 背景动画 ================= */
 body {
-    background: var(--primary-bg);
+    background: linear-gradient(-45deg, #000000, #141414, #080808, #1c1c1c);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: var(--text-light);
     min-height: 100vh;
     padding: 3rem 1.5rem;
+    position: relative;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ================= 动态悬浮几何粒子 ================= */
+.particles {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.particles li {
+    position: absolute;
+    display: block;
+    list-style: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: floatUp 25s linear infinite;
+    bottom: -150px;
+    border-radius: 4px;
+}
+
+.particles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+.particles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+.particles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+.particles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+.particles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+.particles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+.particles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+.particles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+.particles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+.particles li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+    100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+    z-index: 10;
 }
 
 header {
@@ -48,23 +99,50 @@ header p {
     color: var(--text-muted);
 }
 
+/* ================= 强化立体感的发布盒子 ================= */
 .publish-box {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    background: rgba(25, 25, 25, 0.4); /* 稍微加深一点底色以便反射出立体阴影 */
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02); /* 底部边框变暗，模拟光照死角 */
     border-radius: 24px;
     padding: 2rem;
     margin-bottom: 4rem;
+    
+    /* 核心 3D 阴影：深色大外阴影 + 贴身重阴影 + 顶部高光内边 + 底部暗色内边 */
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.8), 
+        0 4px 15px rgba(0, 0, 0, 0.6),        
+        inset 0 1px 1px rgba(255, 255, 255, 0.15), 
+        inset 0 -1px 1px rgba(0, 0, 0, 0.3);       
 }
 
+/* ================= 内凹立体感的输入框 ================= */
 input, textarea {
     width: 100%;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 1rem;
     color: var(--text-light);
     margin-bottom: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    
+    /* 顶部内阴影制造下凹感，底部白光制造刻线感 */
+    box-shadow: 
+        inset 0 3px 6px rgba(0, 0, 0, 0.6), 
+        0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+input:focus, textarea:focus {
+    border-color: #6a9bd8;
+    background: rgba(106, 155, 216, 0.05);
+    box-shadow: 
+        inset 0 2px 5px rgba(0, 0, 0, 0.4), 
+        0 0 15px rgba(106, 155, 216, 0.2), 
+        inset 0 0 10px rgba(106, 155, 216, 0.1);
 }
 
 textarea {
@@ -76,10 +154,29 @@ button {
     padding: 1rem;
     border: none;
     border-radius: 12px;
-    background: var(--accent);
-    color: #000;
+    background: linear-gradient(135deg, #38bdf8 0%, #8b5cf6 100%); 
+    color: #ffffff;
+    font-size: 1.05rem;
     font-weight: bold;
     cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+    
+    /* 按钮本身的立体感 */
+    box-shadow: 
+        0 4px 15px rgba(56, 189, 248, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+button:hover {
+    box-shadow: 
+        0 8px 25px rgba(139, 92, 246, 0.5), 
+        inset 0 1px 1px rgba(255, 255, 255, 0.4); 
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(1px) scale(0.98);
 }
 
 .message-board {
@@ -87,23 +184,43 @@ button {
     gap: 1rem;
 }
 
+/* ================= 附带轻度立体感的留言卡片 ================= */
 .message-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    overflow: hidden; 
+    transition: all 0.3s ease;
+    
+    /* 较弱的卡片立体阴影 */
+    box-shadow: 
+        0 10px 20px -5px rgba(0, 0, 0, 0.5), 
+        inset 0 1px 1px rgba(255, 255, 255, 0.08);
 }
+
+/* 鼠标放上留言卡片时会有轻轻浮起的效果 */
+.message-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 15px 30px -5px rgba(0, 0, 0, 0.7), 
+        inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
 .message-content { 
-                    font-size: 1.1rem; 
-                    line-height: 1.7; 
-                    margin-bottom: 1.2rem; 
-                    font-weight: 300; 
-                    
-                    /* ================= 新增以下换行控制代码 ================= */
-                    white-space: pre-wrap;     /* 核心：保留用户在输入框里敲的回车换行，同时允许文字自动触边换行 */
-                    overflow-wrap: break-word; /* 允许在长单词或 URL 地址内部进行换行 */
-                    word-break: break-all;     /* 强制打断连续的英文字符或数字，防止把卡片撑破 */
-                }
+    font-size: 1.1rem; 
+    line-height: 1.7; 
+    margin-bottom: 1.2rem; 
+    font-weight: 300; 
+    white-space: pre-wrap;     
+    overflow-wrap: break-word; 
+    word-break: break-all;     
+}
     
 .message-footer {
     display: flex;
@@ -121,6 +238,11 @@ button {
 </head>
 
 <body>
+
+<ul class="particles">
+    <li></li><li></li><li></li><li></li><li></li>
+    <li></li><li></li><li></li><li></li><li></li>
+</ul>
 
 <div class="container">
 
@@ -141,7 +263,6 @@ button {
 
 </div>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -204,7 +325,7 @@ function card(i) {
     div.className = 'message-card';
 
     div.innerHTML = `
-        <div>${i.content}</div>
+        <div class="message-content">${i.content}</div>
         <div class="message-footer">
             <span>${i.author}</span>
             <span>${new Date(i.created_at).toLocaleString()}</span>
